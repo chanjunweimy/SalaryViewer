@@ -19,9 +19,4 @@ public class UserController {
   public List<User> GetUsers() {
     return _userService.getAllUsers();
   }
-
-  @RequestMapping(value = "/users", method = RequestMethod.POST)
-  public void UpdateUsers() {
-
-  }
 }
