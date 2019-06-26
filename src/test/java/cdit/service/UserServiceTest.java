@@ -8,16 +8,22 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import cdit.Application;
+import cdit.SwaggerConfig;
 import cdit.dao.UserRepository;
 import cdit.model.User;
 
 @RunWith(SpringRunner.class)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DataJpaTest
-@ComponentScan("cdit")
+@ContextConfiguration(classes = { Application.class })
+@ComponentScan(basePackages = "cdit", excludeFilters=@Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SwaggerConfig.class))
 @org.springframework.transaction.annotation.Transactional()
 public class UserServiceTest {  
   private static final double EPSILON = 0.001;
