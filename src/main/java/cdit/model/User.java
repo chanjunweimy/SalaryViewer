@@ -10,12 +10,12 @@ import javax.validation.constraints.NotNull;
 public class User {
   @Id
   @NotNull
-  private String name;
+  private String _name;
   
   @NotNull
   @Min(0)
   @Max(4000)
-  private double salary;
+  private double _salary;
 
   protected User() {}
   
@@ -25,18 +25,18 @@ public class User {
   }
   
   public String getName() {
-    return name;
+    return _name;
   }
 
   public double getSalary() {
-    return salary;
+    return _salary;
   }
 
   private void setName(String name) {
-    this.name = name;
+    this._name = name;
   }
   
   private void setSalary(double salary) {
-    this.salary = salary;
+    this._salary = salary;
   }
 }
