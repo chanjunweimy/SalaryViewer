@@ -41,87 +41,85 @@ import cdit.util.TestHelper;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class HttpRequestTest {
   private static final double EPSILON = 0.001;
-  
+
   @LocalServerPort
   private int _port;
 
   @Autowired
   private TestRestTemplate _restTemplate;
-  
+
   @Rule
   public TemporaryFolder _folder = new TemporaryFolder();
-  
+
   @Test
-  public void TestGetUsersWhenNoData() {
-    List<User> users = GetUsersFromUserController();
+  public void testGetUsersWhenNoData() {
+    List<User> users = getUsersFromUserController();
     assertEquals(0, users.size());
   }
-  
+
   @Test
-  public void TestUpdateUsersThenGetUsers() throws Exception {
+  public void testUpdateUsersThenGetUsers() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"name", "salary"});
     expectedStringArrays.add(new String[] {"John Doe", "2500.05"});
     expectedStringArrays.add(new String[] {"Mary Posa", "4000.00"});
 
-    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
-    HttpStatus status = UploadCsvToUserController(fileLines);
+    List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
+    HttpStatus status = uploadCsvToUserController(fileLines);
     assertEquals(HttpStatus.OK, status);
-    
-    List<User> users = GetUsersFromUserController();
+
+    List<User> users = getUsersFromUserController();
     assertEquals(2, users.size());
     final int nameIndex = 0;
     final int salaryIndex = 1;
-    
+
     for (int i = 0; i < users.size(); i++) {
       String[] expectedStringArray = expectedStringArrays.get(i + 1);
       User actualUser = users.get(i);
       assertEquals(expectedStringArray[nameIndex], actualUser.getName());
-      assertEquals(Double.parseDouble(expectedStringArray[salaryIndex]), actualUser.getSalary(), EPSILON);
+      assertEquals(Double.parseDouble(expectedStringArray[salaryIndex]), actualUser.getSalary(),
+          EPSILON);
     }
   }
-  
+
   @Test
-  public void TestInvalidUpdateUsersWithoutHeader() throws Exception {
+  public void testInvalidUpdateUsersWithoutHeader() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"John Doe", "2500.05"});
 
-    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
-    HttpStatus status = UploadCsvToUserController(fileLines);
+    List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
+    HttpStatus status = uploadCsvToUserController(fileLines);
     assertEquals(HttpStatus.BAD_REQUEST, status);
   }
-  
-  private HttpStatus UploadCsvToUserController(List<String> fileLines)
-      throws Exception {
-    return TestHelper.GetTUsingFile(_folder, fileLines, 
-        (File file) -> {
-          MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();          
-          parameters.add("file", new FileSystemResource(file));
 
-          HttpHeaders headers = new HttpHeaders();
-          headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+  private HttpStatus uploadCsvToUserController(List<String> fileLines) throws Exception {
+    return TestHelper.getTUsingFile(_folder, fileLines, (File file) -> {
+      MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
+      parameters.add("file", new FileSystemResource(file));
 
-          HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<MultiValueMap<String, Object>>(parameters, headers);
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-          ResponseEntity<String> response = _restTemplate.postForEntity(GetUserUrl(), entity, String.class);
+      HttpEntity<MultiValueMap<String, Object>> entity =
+          new HttpEntity<MultiValueMap<String, Object>>(parameters, headers);
 
-          return response.getStatusCode();
-        });
+      ResponseEntity<String> response =
+          _restTemplate.postForEntity(getUserUrl(), entity, String.class);
 
-  } 
-  
-  private List<User> GetUsersFromUserController() {
-    ResponseEntity<List<User>> response = _restTemplate.exchange(
-        GetUserUrl(),
-        HttpMethod.GET,
-        null,
-        new ParameterizedTypeReference<List<User>>(){});
+      return response.getStatusCode();
+    });
+
+  }
+
+  private List<User> getUsersFromUserController() {
+    ResponseEntity<List<User>> response = _restTemplate.exchange(getUserUrl(), HttpMethod.GET, null,
+        new ParameterizedTypeReference<List<User>>() {});
     assertEquals(HttpStatus.OK, response.getStatusCode());
     List<User> users = response.getBody();
     return users;
   }
-  
-  private String GetUserUrl() {
+
+  private String getUserUrl() {
     return String.format("http://localhost:%d/users", _port);
   }
 }

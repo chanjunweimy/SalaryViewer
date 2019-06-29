@@ -25,6 +25,6 @@ public class ControllerContextTest {
 
   @Test
   public void contexLoads() throws Exception {
-      assertNotNull(_userController);
+    assertNotNull(_userController);
   }
 }

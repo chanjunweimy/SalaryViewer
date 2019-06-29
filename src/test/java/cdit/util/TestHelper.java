@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.rules.TemporaryFolder;
 
 public class TestHelper {
-  public static List<String> GetCsvFileLinesFromStringArrays(List<String[]> stringArrays) {
+  public static List<String> getCsvFileLinesFromStringArrays(List<String[]> stringArrays) {
     List<String> fileLines = new ArrayList<String>();
     for (String[] stringArray : stringArrays) {
       StringBuffer buffer = new StringBuffer();
@@ -24,9 +24,9 @@ public class TestHelper {
     }
     return fileLines;
   }
-  
-  public static <T> T GetTUsingFile(TemporaryFolder folder, List<String> fileLines, FunctionWithException<File, T> functionUsingFile)
-      throws Exception {
+
+  public static <T> T getTUsingFile(TemporaryFolder folder, List<String> fileLines,
+      FunctionWithException<File, T> functionUsingFile) throws Exception {
     File file = null;
     try {
       file = folder.newFile();
@@ -48,10 +48,10 @@ public class TestHelper {
     }
     return null;
   }
-  
-  public static <T> T GetTUsingFileInputStream(TemporaryFolder folder, List<String> fileLines, FunctionWithException<InputStream, T> functionUsingInputStream)
-      throws Exception {
-    return GetTUsingFile(folder, fileLines, (File file) -> {
+
+  public static <T> T getTUsingFileInputStream(TemporaryFolder folder, List<String> fileLines,
+      FunctionWithException<InputStream, T> functionUsingInputStream) throws Exception {
+    return getTUsingFile(folder, fileLines, (File file) -> {
       InputStream inputStream = new FileInputStream(file);
       return functionUsingInputStream.apply(inputStream);
     });
