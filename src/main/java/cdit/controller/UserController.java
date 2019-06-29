@@ -26,7 +26,7 @@ public class UserController {
 
   private static final String ENDPOINT_USERS = "/users";
 
-  Logger _logger = LoggerFactory.getLogger(UserController.class);
+  private Logger _logger = LoggerFactory.getLogger(UserController.class);
 
   public UserController(CsvParserService csvParserService, UserMapperService userMapperService,
       UserService userService) {
@@ -38,7 +38,7 @@ public class UserController {
   @PostMapping(value = ENDPOINT_USERS)
   public ResponseEntity<?> updateUsers(@RequestParam("file") MultipartFile multipartFile)
       throws InvalidCsvException, UserListValidationException, IOException {
-    LoggerHelper.LogMessageAtStartOfMethod(_logger, LoggerHelper.METHOD_POST, ENDPOINT_USERS,
+    LoggerHelper.logMessageAtStartOfMethod(_logger, LoggerHelper.METHOD_POST, ENDPOINT_USERS,
         "UserController");
 
     List<String[]> stringArrays =
@@ -46,7 +46,7 @@ public class UserController {
     List<User> users = _userMapperService.mapStringArraysToUsers(stringArrays);
     _userService.updateUsers(users);
 
-    LoggerHelper.LogMessageAtEndOfMethod(_logger, LoggerHelper.METHOD_POST, ENDPOINT_USERS,
+    LoggerHelper.logMessageAtEndOfMethod(_logger, LoggerHelper.METHOD_POST, ENDPOINT_USERS,
         "UserController");
 
     return ResponseEntity.ok().build();
@@ -62,12 +62,12 @@ public class UserController {
 
   @GetMapping(value = ENDPOINT_USERS)
   public List<User> getUsers() {
-    LoggerHelper.LogMessageAtStartOfMethod(_logger, LoggerHelper.METHOD_GET, ENDPOINT_USERS,
+    LoggerHelper.logMessageAtStartOfMethod(_logger, LoggerHelper.METHOD_GET, ENDPOINT_USERS,
         "UserController");
 
     List<User> users = _userService.getAllUsers();
 
-    LoggerHelper.LogMessageAtEndOfMethod(_logger, LoggerHelper.METHOD_POST, ENDPOINT_USERS,
+    LoggerHelper.logMessageAtEndOfMethod(_logger, LoggerHelper.METHOD_POST, ENDPOINT_USERS,
         "UserController");
     return users;
   }
