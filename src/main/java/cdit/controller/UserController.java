@@ -2,6 +2,8 @@ package cdit.controller;
 
 import java.io.IOException;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,14 +29,14 @@ public class UserController {
   }
   
   @PostMapping(value = "/users")
-  public void UpdateUsers(@RequestParam("file") MultipartFile multipartFile) {
+  public ResponseEntity<?> UpdateUsers(@RequestParam("file") MultipartFile multipartFile) {
     try {
       List<String[]> stringArrays = _csvParserService.loadStringArrays(multipartFile.getInputStream());
       List<User> users = _userMapperService.mapStringArraysToUsers(stringArrays);
       _userService.updateUsers(users);
+      return new ResponseEntity<>(HttpStatus.OK);
     } catch (InvalidCsvException | IOException | UserListValidationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
     }
   }
 

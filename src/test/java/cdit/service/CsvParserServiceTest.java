@@ -1,10 +1,6 @@
 package cdit.service;
 
 import static org.junit.Assert.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +19,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import cdit.SwaggerConfig;
 import cdit.exception.InvalidCsvException;
+import cdit.util.TestHelper;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -43,16 +40,14 @@ public class CsvParserServiceTest {
   }
 
   @Test
-  public void testValidCsv() throws InvalidCsvException {
-    final String fileName = "valid.csv";
+  public void testValidCsv() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"name", "salary"});
     expectedStringArrays.add(new String[] {"John", "2500.05"});
     expectedStringArrays.add(new String[] {"Mary Posa", "4000.00"});
-    expectedStringArrays.add(new String[] {"Mike", "4001.00"});
 
-    List<String> fileLines = GetCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileName, fileLines);
+    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
+    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
     for (int i = 0; i < expectedStringArrays.size(); i++) {
       String[] expectedStringArray = expectedStringArrays.get(i);
@@ -65,14 +60,13 @@ public class CsvParserServiceTest {
   }
 
   @Test
-  public void testValidCsvWithEmptyFields() throws InvalidCsvException {
-    final String fileName = "validEmptyFields.csv";
+  public void testValidCsvWithEmptyFields() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {""});
     expectedStringArrays.add(new String[] {""});
 
-    List<String> fileLines = GetCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileName, fileLines);
+    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
+    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
     for (int i = 0; i < expectedStringArrays.size(); i++) {
       String[] expectedStringArray = expectedStringArrays.get(i);
@@ -86,20 +80,17 @@ public class CsvParserServiceTest {
 
   /**
    * Trimming is forbidden by RFC 4180
-   * 
-   * @throws InvalidCsvException
+   * @throws Exception 
    */
   @Test
-  public void testValidCsvWithSpacing() throws InvalidCsvException {
-    final String fileName = "valid.csv";
+  public void testValidCsvWithSpacing() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"name", "salary"});
     expectedStringArrays.add(new String[] {"John    ", "2500.05"});
     expectedStringArrays.add(new String[] {"Mary Posa", "4000.00"});
-    expectedStringArrays.add(new String[] {"Mike", "4001.00"});
 
-    List<String> fileLines = GetCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileName, fileLines);
+    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
+    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
     for (int i = 0; i < expectedStringArrays.size(); i++) {
       String[] expectedStringArray = expectedStringArrays.get(i);
@@ -113,20 +104,17 @@ public class CsvParserServiceTest {
 
   /**
    * Fields with embedded line breaks must be quoted
-   * 
-   * @throws InvalidCsvException
+   * @throws Exception 
    */
   @Test
-  public void testValidCsvWithQuotesAndNewLine() throws InvalidCsvException {
-    final String fileName = "valid.csv";
+  public void testValidCsvWithQuotesAndNewLine() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"name", "salary"});
     expectedStringArrays.add(new String[] {"\"John  \nDoe\"", "2500.05"});
     expectedStringArrays.add(new String[] {"Mary Posa", "4000.00"});
-    expectedStringArrays.add(new String[] {"Mike", "4001.00"});
 
-    List<String> fileLines = GetCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileName, fileLines);
+    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
+    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
 
     expectedStringArrays.get(1)[0] = expectedStringArrays.get(1)[0].replaceAll("\"", "");
@@ -141,16 +129,14 @@ public class CsvParserServiceTest {
   }
 
   @Test
-  public void testValidCsvWithQuotesAndComa() throws InvalidCsvException {
-    final String fileName = "valid.csv";
+  public void testValidCsvWithQuotesAndComa() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"name", "salary"});
     expectedStringArrays.add(new String[] {"\"John,Doe\"", "2500.05"});
     expectedStringArrays.add(new String[] {"Mary Posa", "4000.00"});
-    expectedStringArrays.add(new String[] {"Mike", "4001.00"});
 
-    List<String> fileLines = GetCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileName, fileLines);
+    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
+    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
 
     expectedStringArrays.get(1)[0] = expectedStringArrays.get(1)[0].replaceAll("\"", "");
@@ -165,14 +151,13 @@ public class CsvParserServiceTest {
   }
 
   @Test()
-  public void testMultiColumnCsvWithEmptyValues() throws InvalidCsvException {
-    final String fileName = "valid.csv";
+  public void testMultiColumnCsvWithEmptyValues() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"name", "salary"});
     expectedStringArrays.add(new String[] {"", ""});
 
-    List<String> fileLines = GetCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileName, fileLines);
+    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
+    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
     for (int i = 0; i < expectedStringArrays.size(); i++) {
       String[] expectedStringArray = expectedStringArrays.get(i);
@@ -185,11 +170,10 @@ public class CsvParserServiceTest {
   }
 
   @Test
-  public void testEmptyCsv() throws InvalidCsvException {
-    final String fileName = "empty.csv";
+  public void testEmptyCsv() throws Exception {
     List<String[]> expectedStringArrays = Arrays.asList();
-    List<String> fileLines = GetCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileName, fileLines);
+    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
+    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
     for (int i = 0; i < expectedStringArrays.size(); i++) {
       String[] expectedStringArray = expectedStringArrays.get(i);
@@ -202,95 +186,56 @@ public class CsvParserServiceTest {
   }
 
   @Test(expected = InvalidCsvException.class)
-  public void testInvalidCsvWithInconsistentNumberOfColumns() throws InvalidCsvException {
-    final String fileName = "invalid.csv";
+  public void testInvalidCsvWithInconsistentNumberOfColumns() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"John", "2500.05"});
-    List<String> fileLines = GetCsvFileLinesFromStringArrays(expectedStringArrays);
+    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
     fileLines.add("a,1,a");
-    GetStringArraysFromCsv(fileName, fileLines);
+    GetStringArraysFromCsv(fileLines);
   }
 
   @Test(expected = InvalidCsvException.class)
-  public void testMultiColumnCsvWithEmptyLine() throws InvalidCsvException {
-    final String fileName = "valid.csv";
+  public void testMultiColumnCsvWithEmptyLine() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"name", "salary"});
     expectedStringArrays.add(new String[] {"John", "2500.05"});
     expectedStringArrays.add(new String[] {"Mary Posa", "4000.00"});
-    expectedStringArrays.add(new String[] {"Mike", "4001.00"});
 
-    List<String> fileLines = GetCsvFileLinesFromStringArrays(expectedStringArrays);
+    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
     fileLines.add(2, "");
-    GetStringArraysFromCsv(fileName, fileLines);
+    GetStringArraysFromCsv(fileLines);
   }
 
   /**
    * Double quotes are not allowed in unquoted fields according to RFC 4180
-   * 
-   * @throws InvalidCsvException
+   * @throws Exception 
    */
   @Test(expected = InvalidCsvException.class)
-  public void testInvalidCsvDoubleQuoteInUnquotedField() throws InvalidCsvException {
-    final String fileName = "invalid.csv";
+  public void testInvalidCsvDoubleQuoteInUnquotedField() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"Jo\"hn", "2500.05"});
-    List<String> fileLines = GetCsvFileLinesFromStringArrays(expectedStringArrays);
-    GetStringArraysFromCsv(fileName, fileLines);
+    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
+    GetStringArraysFromCsv(fileLines);
   }
 
   /**
    * Not supported by com.fasterxml.jackson
-   * 
-   * @throws InvalidCsvException
+   * @throws Exception 
    */
   @Test(expected = InvalidCsvException.class)
-  public void testCsvWithQuotesAndPairedEmbeddedQuotes() throws InvalidCsvException {
-    final String fileName = "valid.csv";
+  public void testCsvWithQuotesAndPairedEmbeddedQuotes() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"name", "salary"});
     expectedStringArrays.add(new String[] {"\"\"John Doe\"\"", "2500.05"});
 
-    List<String> fileLines = GetCsvFileLinesFromStringArrays(expectedStringArrays);
-    GetStringArraysFromCsv(fileName, fileLines);
+    List<String> fileLines = TestHelper.GetCsvFileLinesFromStringArrays(expectedStringArrays);
+    GetStringArraysFromCsv(fileLines);
   }
 
-  private List<String> GetCsvFileLinesFromStringArrays(List<String[]> stringArrays) {
-    List<String> fileLines = new ArrayList<String>();
-    for (String[] stringArray : stringArrays) {
-      StringBuffer buffer = new StringBuffer();
-      buffer.append(stringArray[0]);
-      for (int i = 1; i < stringArray.length; i++) {
-        buffer.append(",");
-        buffer.append(stringArray[i]);
-      }
-      fileLines.add(buffer.toString());
-    }
-    return fileLines;
-  }
+  private List<String[]> GetStringArraysFromCsv(List<String> fileLines)
+      throws Exception {
+    return TestHelper.GetTUsingFileInputStream(_folder, fileLines, 
+        (InputStream inputStream) -> _csvParserService.loadStringArrays(inputStream));
 
-  private List<String[]> GetStringArraysFromCsv(String fileName, List<String> fileLines)
-      throws InvalidCsvException {
-    File file = null;
-    try {
-      file = _folder.newFile(fileName);
-      FileWriter writer = new FileWriter(file);
-      for (String line : fileLines) {
-        writer.write(line + System.lineSeparator());
-      }
-      writer.close();
-
-      InputStream inputStream = new FileInputStream(file);
-      return _csvParserService.loadStringArrays(inputStream);
-
-    } catch (IOException e) {
-      e.printStackTrace();
-      fail();
-    } finally {
-      if (file != null) {
-        file.delete();
-      }
-    }
-    return null;
   }
 }
