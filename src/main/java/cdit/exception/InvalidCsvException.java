@@ -1,6 +1,6 @@
 package cdit.exception;
 
-public class InvalidCsvException extends Exception {
+public class InvalidCsvException extends CditException {
 
   public InvalidCsvException() {
     super();

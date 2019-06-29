@@ -1,6 +1,6 @@
 package cdit.exception;
 
-public class UserListValidationException extends Exception {
+public class UserListValidationException extends CditException {
   /**
    * 
    */
