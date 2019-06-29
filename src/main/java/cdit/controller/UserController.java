@@ -2,8 +2,8 @@ package cdit.controller;
 
 import java.io.IOException;
 import java.util.List;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +26,7 @@ public class UserController {
     _userService = userService;
   }
   
-  @RequestMapping(value = "/users", method = RequestMethod.POST)
+  @PostMapping(value = "/users")
   public void UpdateUsers(@RequestParam("file") MultipartFile multipartFile) {
     try {
       List<String[]> stringArrays = _csvParserService.loadStringArrays(multipartFile.getInputStream());
@@ -38,7 +38,7 @@ public class UserController {
     }
   }
 
-  @RequestMapping(value = "/users", method = RequestMethod.GET)
+  @GetMapping(value = "/users")
   public List<User> GetUsers() {
     return _userService.getAllUsers();
   }
