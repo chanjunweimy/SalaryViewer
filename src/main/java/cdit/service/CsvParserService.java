@@ -1,9 +1,9 @@
 package cdit.service;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import cdit.exception.InvalidCsvException;
 
 public interface CsvParserService {
-  public <T> List<T> loadObjectList(Class<T> type, File file) throws InvalidCsvException;
+  public List<String[]> loadStringArrays(InputStream inputStream) throws InvalidCsvException;
 }

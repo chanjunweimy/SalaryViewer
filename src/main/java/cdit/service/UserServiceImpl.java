@@ -10,7 +10,7 @@ import cdit.model.User;
 public class UserServiceImpl implements UserService {
   private final UserRepository _userRepository;
   private final ReentrantLock _lock = new ReentrantLock();
-  
+
   public UserServiceImpl(UserRepository userRepository) {
     _userRepository = userRepository;
   }
@@ -20,11 +20,11 @@ public class UserServiceImpl implements UserService {
     _lock.lock();
     try {
       _userRepository.deleteAll();
-      _userRepository.saveAll(users);  
+      _userRepository.saveAll(users);
       _userRepository.flush();
     } finally {
       _lock.unlock();
-    }    
+    }
   }
 
   @Override
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
       users = _userRepository.findAll();
     } finally {
       _lock.unlock();
-    }    
+    }
     return users;
   }
 }

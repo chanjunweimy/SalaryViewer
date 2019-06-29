@@ -2,6 +2,14 @@ package cdit.exception;
 
 public class InvalidCsvException extends Exception {
 
+  public InvalidCsvException() {
+    super();
+  }
+
+  public InvalidCsvException(String message) {
+    super(message);
+  }
+
   /**
    * 
    */

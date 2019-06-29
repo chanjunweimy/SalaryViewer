@@ -20,22 +20,25 @@ import cdit.model.User;
 @RunWith(SpringRunner.class)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DataJpaTest
-@ComponentScan(basePackages = "cdit", excludeFilters=@Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SwaggerConfig.class))
+@ComponentScan(basePackages = "cdit",
+    excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SwaggerConfig.class))
 @org.springframework.transaction.annotation.Transactional()
-public class UserServiceTest {  
+public class UserServiceTest {
   private static final double EPSILON = 0.001;
-  
-  @Autowired private UserRepository _userRepository;
-  @Autowired private UserServiceImpl _userService;  
-  
+
+  @Autowired
+  private UserRepository _userRepository;
+  @Autowired
+  private UserServiceImpl _userService;
+
   @Test
-  public void testInjectedComponentsAreNotNull(){
+  public void testInjectedComponentsAreNotNull() {
     assertNotNull(_userRepository);
     assertNotNull(_userService);
   }
-  
+
   @Test
-  public void testGetAllUsers(){
+  public void testGetAllUsers() {
     User expectedUser = new User("alice", 1);
     _userRepository.saveAndFlush(expectedUser);
     List<User> actualUsers = _userService.getAllUsers();
@@ -44,15 +47,15 @@ public class UserServiceTest {
     assertEquals(expectedUser.getName(), actualUser.getName());
     assertEquals(expectedUser.getSalary(), actualUser.getSalary(), EPSILON);
   }
-  
+
   @Test
-  public void testUpdateUsers_AddNew(){
-    assertEquals(0, _userRepository.findAll().size());   
+  public void testUpdateUsers_AddNew() {
+    assertEquals(0, _userRepository.findAll().size());
 
     User expectedUser = new User("alice", 1);
     List<User> expectedUsers = new ArrayList<User>();
     expectedUsers.add(expectedUser);
-    
+
     _userService.updateUsers(expectedUsers);
 
     List<User> actualUsers = _userRepository.findAll();
@@ -61,18 +64,18 @@ public class UserServiceTest {
     assertEquals(expectedUser.getName(), actualUser.getName());
     assertEquals(expectedUser.getSalary(), actualUser.getSalary(), EPSILON);
   }
-  
+
   @Test
-  public void testUpdateUsers_ReplaceExisting(){
+  public void testUpdateUsers_ReplaceExisting() {
     User originalUser = new User("Bob", 2);
     _userRepository.saveAndFlush(originalUser);
 
-    assertEquals(1, _userRepository.findAll().size());   
+    assertEquals(1, _userRepository.findAll().size());
 
     User expectedUser = new User("alice", 1);
     List<User> expectedUsers = new ArrayList<User>();
     expectedUsers.add(expectedUser);
-    
+
     _userService.updateUsers(expectedUsers);
 
     List<User> actualUsers = _userRepository.findAll();
