@@ -29,6 +29,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import cdit.RestExceptionHandler;
 import cdit.SwaggerConfig;
 import cdit.model.User;
 import cdit.util.TestHelper;
@@ -65,8 +66,8 @@ public class HttpRequestTest {
     expectedStringArrays.add(new String[] {"Mary Posa", "4000.00"});
 
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
-    HttpStatus status = uploadCsvToUserController(fileLines);
-    assertEquals(HttpStatus.OK, status);
+    ResponseEntity<String> response = uploadCsvToUserController(fileLines);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
 
     List<User> users = getUsersFromUserController();
     assertEquals(2, users.size());
@@ -81,6 +82,18 @@ public class HttpRequestTest {
           EPSILON);
     }
   }
+  
+  @Test
+  public void testInvalidCsv() throws Exception {
+    List<String[]> expectedStringArrays = new ArrayList<String[]>();
+    expectedStringArrays.add(new String[] {"name", "salary"});
+    expectedStringArrays.add(new String[] {"John Doe", "2500.05", "a"});
+
+    List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
+    ResponseEntity<String> response = uploadCsvToUserController(fileLines);
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals(RestExceptionHandler.MSG_INVALID_CSV, response.getBody());
+  }
 
   @Test
   public void testInvalidUpdateUsersWithoutHeader() throws Exception {
@@ -88,11 +101,61 @@ public class HttpRequestTest {
     expectedStringArrays.add(new String[] {"John Doe", "2500.05"});
 
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
-    HttpStatus status = uploadCsvToUserController(fileLines);
-    assertEquals(HttpStatus.BAD_REQUEST, status);
+    ResponseEntity<String> response = uploadCsvToUserController(fileLines);
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals(RestExceptionHandler.MSG_USER_MISSING_HEADER, response.getBody());
+  }
+  
+  @Test
+  public void testInvalidUpdateUsersWithEmptyName() throws Exception {
+    List<String[]> expectedStringArrays = new ArrayList<String[]>();
+    expectedStringArrays.add(new String[] {"name", "salary"});
+    expectedStringArrays.add(new String[] {"", "2500.05"});
+
+    List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
+    ResponseEntity<String> response = uploadCsvToUserController(fileLines);
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals(RestExceptionHandler.MSG_USER_NAME_EMPTY, response.getBody());
+  }
+  
+  @Test
+  public void testInvalidUpdateUsersWithDuplicateName() throws Exception {
+    List<String[]> expectedStringArrays = new ArrayList<String[]>();
+    expectedStringArrays.add(new String[] {"name", "salary"});
+    expectedStringArrays.add(new String[] {"John Doe", "2500.05"});
+    expectedStringArrays.add(new String[] {"John Doe", "2500.15"});
+
+    List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
+    ResponseEntity<String> response = uploadCsvToUserController(fileLines);
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals(RestExceptionHandler.MSG_USER_NAME_DUPLICATE, response.getBody());
+  }
+  
+  @Test
+  public void testInvalidUpdateUsersWithInvalidSalary() throws Exception {
+    List<String[]> expectedStringArrays = new ArrayList<String[]>();
+    expectedStringArrays.add(new String[] {"name", "salary"});
+    expectedStringArrays.add(new String[] {"John Doe", "true"});
+
+    List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
+    ResponseEntity<String> response = uploadCsvToUserController(fileLines);
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals(RestExceptionHandler.MSG_USER_SALARY_INVALID, response.getBody());
+  }
+  
+  @Test
+  public void testInvalidUpdateUsersWithSalaryNotInRange() throws Exception {
+    List<String[]> expectedStringArrays = new ArrayList<String[]>();
+    expectedStringArrays.add(new String[] {"name", "salary"});
+    expectedStringArrays.add(new String[] {"John Doe", "-1"});
+
+    List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
+    ResponseEntity<String> response = uploadCsvToUserController(fileLines);
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals(RestExceptionHandler.MSG_USER_SALARY_INVALID, response.getBody());
   }
 
-  private HttpStatus uploadCsvToUserController(List<String> fileLines) throws Exception {
+  private ResponseEntity<String> uploadCsvToUserController(List<String> fileLines) throws Exception {
     return TestHelper.getTUsingFile(_folder, fileLines, (File file) -> {
       MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
       parameters.add("file", new FileSystemResource(file));
@@ -106,7 +169,7 @@ public class HttpRequestTest {
       ResponseEntity<String> response =
           _restTemplate.postForEntity(getUserUrl(), entity, String.class);
 
-      return response.getStatusCode();
+      return response;
     });
 
   }
