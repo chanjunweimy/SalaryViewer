@@ -25,7 +25,7 @@ public class TestHelper {
     return fileLines;
   }
 
-  public static <T> T getTUsingFile(TemporaryFolder folder, List<String> fileLines,
+  public static <T> T getObjectUsingFile(TemporaryFolder folder, List<String> fileLines,
       FunctionWithException<File, T> functionUsingFile) throws Exception {
     File file = null;
     try {
@@ -49,9 +49,9 @@ public class TestHelper {
     return null;
   }
 
-  public static <T> T getTUsingFileInputStream(TemporaryFolder folder, List<String> fileLines,
+  public static <T> T getObjectUsingFileInputStream(TemporaryFolder folder, List<String> fileLines,
       FunctionWithException<InputStream, T> functionUsingInputStream) throws Exception {
-    return getTUsingFile(folder, fileLines, (File file) -> {
+    return getObjectUsingFile(folder, fileLines, (File file) -> {
       InputStream inputStream = new FileInputStream(file);
       return functionUsingInputStream.apply(inputStream);
     });

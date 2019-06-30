@@ -8,6 +8,7 @@ public class CditException extends Exception {
   public CditException(String message) {
     super(message);
   }
+
   /**
    * 
    */

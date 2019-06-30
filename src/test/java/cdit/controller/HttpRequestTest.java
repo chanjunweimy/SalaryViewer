@@ -82,7 +82,7 @@ public class HttpRequestTest {
           EPSILON);
     }
   }
-  
+
   @Test
   public void testInvalidCsv() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
@@ -105,7 +105,7 @@ public class HttpRequestTest {
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertEquals(RestExceptionHandler.MSG_USER_MISSING_HEADER, response.getBody());
   }
-  
+
   @Test
   public void testInvalidUpdateUsersWithEmptyName() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
@@ -117,7 +117,7 @@ public class HttpRequestTest {
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertEquals(RestExceptionHandler.MSG_USER_NAME_EMPTY, response.getBody());
   }
-  
+
   @Test
   public void testInvalidUpdateUsersWithDuplicateName() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
@@ -130,7 +130,7 @@ public class HttpRequestTest {
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertEquals(RestExceptionHandler.MSG_USER_NAME_DUPLICATE, response.getBody());
   }
-  
+
   @Test
   public void testInvalidUpdateUsersWithInvalidSalary() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
@@ -142,7 +142,7 @@ public class HttpRequestTest {
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertEquals(RestExceptionHandler.MSG_USER_SALARY_INVALID, response.getBody());
   }
-  
+
   @Test
   public void testInvalidUpdateUsersWithSalaryNotInRange() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
@@ -155,8 +155,9 @@ public class HttpRequestTest {
     assertEquals(RestExceptionHandler.MSG_USER_SALARY_INVALID, response.getBody());
   }
 
-  private ResponseEntity<String> uploadCsvToUserController(List<String> fileLines) throws Exception {
-    return TestHelper.getTUsingFile(_folder, fileLines, (File file) -> {
+  private ResponseEntity<String> uploadCsvToUserController(List<String> fileLines)
+      throws Exception {
+    return TestHelper.getObjectUsingFile(_folder, fileLines, (File file) -> {
       MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
       parameters.add("file", new FileSystemResource(file));
 

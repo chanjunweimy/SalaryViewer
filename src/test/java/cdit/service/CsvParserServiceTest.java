@@ -19,6 +19,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import cdit.SwaggerConfig;
 import cdit.exception.InvalidCsvException;
+import cdit.util.StringArrayCsvMapper;
 import cdit.util.TestHelper;
 
 @RunWith(SpringRunner.class)
@@ -47,7 +48,7 @@ public class CsvParserServiceTest {
     expectedStringArrays.add(new String[] {"Mary Posa", "4000.00"});
 
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
+    List<String[]> actualStringArrays = getStringArraysFromCsv(fileLines, new String[] {"1", "2"});
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
     for (int i = 0; i < expectedStringArrays.size(); i++) {
       String[] expectedStringArray = expectedStringArrays.get(i);
@@ -66,7 +67,7 @@ public class CsvParserServiceTest {
     expectedStringArrays.add(new String[] {""});
 
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
+    List<String[]> actualStringArrays = getStringArraysFromCsv(fileLines, new String[] {"1"});
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
     for (int i = 0; i < expectedStringArrays.size(); i++) {
       String[] expectedStringArray = expectedStringArrays.get(i);
@@ -91,7 +92,7 @@ public class CsvParserServiceTest {
     expectedStringArrays.add(new String[] {"Mary Posa", "4000.00"});
 
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
+    List<String[]> actualStringArrays = getStringArraysFromCsv(fileLines, new String[] {"1", "2"});
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
     for (int i = 0; i < expectedStringArrays.size(); i++) {
       String[] expectedStringArray = expectedStringArrays.get(i);
@@ -116,7 +117,7 @@ public class CsvParserServiceTest {
     expectedStringArrays.add(new String[] {"Mary Posa", "4000.00"});
 
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
+    List<String[]> actualStringArrays = getStringArraysFromCsv(fileLines, new String[] {"1", "2"});
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
 
     expectedStringArrays.get(1)[0] = expectedStringArrays.get(1)[0].replaceAll("\"", "");
@@ -138,7 +139,7 @@ public class CsvParserServiceTest {
     expectedStringArrays.add(new String[] {"Mary Posa", "4000.00"});
 
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
+    List<String[]> actualStringArrays = getStringArraysFromCsv(fileLines, new String[] {"1", "2"});
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
 
     expectedStringArrays.get(1)[0] = expectedStringArrays.get(1)[0].replaceAll("\"", "");
@@ -159,7 +160,7 @@ public class CsvParserServiceTest {
     expectedStringArrays.add(new String[] {"", ""});
 
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
+    List<String[]> actualStringArrays = getStringArraysFromCsv(fileLines, new String[] {"1", "2"});
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
     for (int i = 0; i < expectedStringArrays.size(); i++) {
       String[] expectedStringArray = expectedStringArrays.get(i);
@@ -175,7 +176,7 @@ public class CsvParserServiceTest {
   public void testEmptyCsv() throws Exception {
     List<String[]> expectedStringArrays = Arrays.asList();
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
-    List<String[]> actualStringArrays = GetStringArraysFromCsv(fileLines);
+    List<String[]> actualStringArrays = getStringArraysFromCsv(fileLines, new String[] {"1"});
     assertEquals(expectedStringArrays.size(), actualStringArrays.size());
     for (int i = 0; i < expectedStringArrays.size(); i++) {
       String[] expectedStringArray = expectedStringArrays.get(i);
@@ -193,7 +194,7 @@ public class CsvParserServiceTest {
     expectedStringArrays.add(new String[] {"John", "2500.05"});
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
     fileLines.add("a,1,a");
-    GetStringArraysFromCsv(fileLines);
+    getStringArraysFromCsv(fileLines, new String[] {"1", "2"});
   }
 
   @Test(expected = InvalidCsvException.class)
@@ -205,7 +206,7 @@ public class CsvParserServiceTest {
 
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
     fileLines.add(2, "");
-    GetStringArraysFromCsv(fileLines);
+    getStringArraysFromCsv(fileLines, new String[] {"1", "2"});
   }
 
   /**
@@ -218,7 +219,7 @@ public class CsvParserServiceTest {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();
     expectedStringArrays.add(new String[] {"Jo\"hn", "2500.05"});
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
-    GetStringArraysFromCsv(fileLines);
+    getStringArraysFromCsv(fileLines, new String[] {"1", "2"});
   }
 
   /**
@@ -233,12 +234,14 @@ public class CsvParserServiceTest {
     expectedStringArrays.add(new String[] {"\"\"John Doe\"\"", "2500.05"});
 
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
-    GetStringArraysFromCsv(fileLines);
+    getStringArraysFromCsv(fileLines, new String[] {"1", "2"});
   }
 
-  private List<String[]> GetStringArraysFromCsv(List<String> fileLines) throws Exception {
-    return TestHelper.getTUsingFileInputStream(_folder, fileLines,
-        (InputStream inputStream) -> _csvParserService.loadStringArrays(inputStream));
+  private List<String[]> getStringArraysFromCsv(List<String> fileLines, String[] headers)
+      throws Exception {
+    return TestHelper.getObjectUsingFileInputStream(_folder, fileLines,
+        (InputStream inputStream) -> _csvParserService.parseInputStream(inputStream,
+            new StringArrayCsvMapper(headers)));
 
   }
 }

@@ -14,8 +14,7 @@ import cdit.service.CsvParserService;
 import cdit.service.UserMapperService;
 import cdit.service.UserService;
 import cdit.util.LoggerHelper;
-import cdit.exception.InvalidCsvException;
-import cdit.exception.UserListValidationException;
+import cdit.exception.CditException;
 import cdit.model.User;
 
 @RestController
@@ -37,27 +36,18 @@ public class UserController {
 
   @PostMapping(value = ENDPOINT_USERS)
   public ResponseEntity<?> updateUsers(@RequestParam("file") MultipartFile multipartFile)
-      throws InvalidCsvException, UserListValidationException, IOException {
+      throws CditException, IOException {
     LoggerHelper.logMessageAtStartOfMethod(_logger, LoggerHelper.METHOD_POST, ENDPOINT_USERS,
         "UserController");
 
-    List<String[]> stringArrays =
-        _csvParserService.loadStringArrays(multipartFile.getInputStream());
-    List<User> users = _userMapperService.mapStringArraysToUsers(stringArrays);
+    List<User> users =
+        _csvParserService.parseInputStream(multipartFile.getInputStream(), _userMapperService);
     _userService.updateUsers(users);
 
     LoggerHelper.logMessageAtEndOfMethod(_logger, LoggerHelper.METHOD_POST, ENDPOINT_USERS,
         "UserController");
 
     return ResponseEntity.ok().build();
-    /*
-     * try {
-     * 
-     * } catch (InvalidCsvException e) { return ResponseEntity.badRequest().body(""); } catch
-     * (UserListValidationException e) { return ResponseEntity.badRequest().body(""); } catch
-     * (Exception e) { return ResponseEntity.badRequest().
-     * body("Failed to update users. Please contact the System Administrator for more details."); }
-     */
   }
 
   @GetMapping(value = ENDPOINT_USERS)
