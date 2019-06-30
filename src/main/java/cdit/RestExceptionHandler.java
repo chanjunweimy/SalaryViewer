@@ -89,7 +89,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(MaxUploadSizeExceededException.class)
-  protected ResponseEntity<Object> MaxUploadSizeExceededException(Exception ex, WebRequest request) {
+  protected ResponseEntity<Object> handleMaxUploadSizeExceededException(Exception ex, WebRequest request) {
     _logger.error(ex.getMessage());
     return handleExceptionInternal(ex, MSG_UPLOAD_SIZE_EXCEEDED, new HttpHeaders(), HttpStatus.BAD_REQUEST,
         request);
