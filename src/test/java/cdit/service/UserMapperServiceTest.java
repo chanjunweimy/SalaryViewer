@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -18,6 +20,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import cdit.SwaggerConfig;
+import cdit.exception.CditException;
 import cdit.exception.UserDuplicateException;
 import cdit.exception.UserMissingCsvHeaderException;
 import cdit.exception.UserNameIsEmptyException;
@@ -237,7 +240,99 @@ public class UserMapperServiceTest {
     List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
     getUsersFromCsv(fileLines);
   }
+  
+  @Test
+  public void testGetHeaderIndices() throws CditException {
+    String[] row = new String[] { "name", "a", "salary" };
+    Map<String, Integer> headerIndices = _userMapperService.getHeaderIndices(row);
+    for (int i = 0; i < row.length; i++) {
+      assertEquals(i, headerIndices.get(row[i]).intValue());
+    }
+  }
+  
+  @Test
+  public void testValidateHeaderIndicesSuccess() throws CditException {
+    Map<String, Integer> headerIndices = new Hashtable<String, Integer>();
+    headerIndices.put("name", 0);
+    headerIndices.put("salary", 1);
+    _userMapperService.validateHeaderIndices(headerIndices);
+  }
+  
+  @Test(expected = UserMissingCsvHeaderException.class)
+  public void testValidateHeaderIndicesFailedDueToMissingName() throws CditException {
+    Map<String, Integer> headerIndices = new Hashtable<String, Integer>();
+    headerIndices.put("salary", 1);
+    _userMapperService.validateHeaderIndices(headerIndices);
+  }
+  
+  @Test(expected = UserMissingCsvHeaderException.class)
+  public void testValidateHeaderIndicesFailedDueToMissingSalary() throws CditException {
+    Map<String, Integer> headerIndices = new Hashtable<String, Integer>();
+    headerIndices.put("name", 0);
+    _userMapperService.validateHeaderIndices(headerIndices);
+  }
 
+  @Test
+  public void testCreateObjectByValidRow() throws CditException {
+    Map<String, Integer> headerIndices = new Hashtable<String, Integer>();
+    headerIndices.put("name", 0);
+    headerIndices.put("salary", 1);
+    String[] row = new String[] { "bob", "3000" };
+    User user = _userMapperService.createObjectByRow(row, headerIndices);
+    assertEquals(row[headerIndices.get("name").intValue()], user.getName());
+    assertEquals(Double.parseDouble(row[headerIndices.get("salary").intValue()]), 
+                 user.getSalary(), EPSILON);
+  }
+  
+  @Test(expected = UserSalaryInvalidTypeException.class)
+  public void testCreateObjectByRowWithInvalidSalary() throws CditException {
+    Map<String, Integer> headerIndices = new Hashtable<String, Integer>();
+    headerIndices.put("name", 0);
+    headerIndices.put("salary", 1);
+    String[] row = new String[] { "bob", "true" };
+    _userMapperService.createObjectByRow(row, headerIndices);
+  }
+  
+  @Test
+  public void testValidateObjectSuccess() throws CditException {
+    User user = new User("bob", 3000);
+    _userMapperService.validateObject(user);
+  }
+  
+  @Test(expected = UserNameIsEmptyException.class)
+  public void testValidateObjectFailedDueToEmptyName() throws CditException {
+    User user = new User("", 3000);
+    _userMapperService.validateObject(user);
+  }
+  
+  @Test(expected = UserSalaryOutOfRangeException.class)
+  public void testValidateObjectFailedDueToSalaryMinRange() throws CditException {
+    User user = new User("bob", -1);
+    _userMapperService.validateObject(user);
+  }
+  
+  @Test(expected = UserSalaryOutOfRangeException.class)
+  public void testValidateObjectFailedDueToSalaryMaxRange() throws CditException {
+    User user = new User("bob", 4000.1);
+    _userMapperService.validateObject(user);
+  }
+  
+  @Test
+  public void testValidateObjectsSuccess() throws CditException {
+    List<User> users = new ArrayList<User>();
+    users.add(new User("alice", 2999));
+    users.add(new User("bob", 2999));
+    _userMapperService.validateObjects(users);
+  }
+  
+  @Test(expected = UserDuplicateException.class)
+  public void testValidateObjectsFailedDueToDuplicateNames() throws CditException {
+    List<User> users = new ArrayList<User>();
+    users.add(new User("bob", 1));
+    users.add(new User("bob", 2999));
+    _userMapperService.validateObjects(users);
+  }
+  
   private List<User> getUsersFromCsv(List<String> fileLines) throws Exception {
     return TestHelper.getObjectUsingFileInputStream(_folder, fileLines,
         (InputStream inputStream) -> _csvParserService.parseInputStream(inputStream,
