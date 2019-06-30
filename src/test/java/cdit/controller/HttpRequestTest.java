@@ -82,7 +82,47 @@ public class HttpRequestTest {
           EPSILON);
     }
   }
+  
+  @Test
+  public void testUpdateUsersThenGetUsersStressTest() throws Exception {
+    List<String[]> expectedStringArrays = new ArrayList<String[]>();
+    expectedStringArrays.add(new String[] {"name", "salary"});
+    for (int i = 0; i < 100000; i++) {
+      expectedStringArrays.add(new String[] { i + "", "1.00"});
+    }
 
+    List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
+    ResponseEntity<String> response = uploadCsvToUserController(fileLines);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+
+    List<User> users = getUsersFromUserController();
+    assertEquals(expectedStringArrays.size() - 1, users.size());
+    final int nameIndex = 0;
+    final int salaryIndex = 1;
+
+    for (int i = 0; i < users.size(); i++) {
+      String[] expectedStringArray = expectedStringArrays.get(i + 1);
+      User actualUser = users.get(i);
+      assertEquals(expectedStringArray[nameIndex], actualUser.getName());
+      assertEquals(Double.parseDouble(expectedStringArray[salaryIndex]), actualUser.getSalary(),
+          EPSILON);
+    }
+  }
+  
+  @Test
+  public void testUpdateUsersThenGetUsersExceedUploadLimit() throws Exception {
+    List<String[]> expectedStringArrays = new ArrayList<String[]>();
+    expectedStringArrays.add(new String[] {"name", "salary"});
+    for (int i = 0; i < 200000; i++) {
+      expectedStringArrays.add(new String[] { i + "", "1.00"});
+    }
+
+    List<String> fileLines = TestHelper.getCsvFileLinesFromStringArrays(expectedStringArrays);
+    ResponseEntity<String> response = uploadCsvToUserController(fileLines);
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals(RestExceptionHandler.MSG_UPLOAD_SIZE_EXCEEDED, response.getBody());
+  }
+  
   @Test
   public void testInvalidCsv() throws Exception {
     List<String[]> expectedStringArrays = new ArrayList<String[]>();

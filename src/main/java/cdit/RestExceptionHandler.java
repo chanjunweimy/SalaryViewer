@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import cdit.exception.CditException;
 import cdit.exception.InvalidCsvException;
@@ -31,6 +32,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       "Please revise your Users\' CSV file as the \'salary\' must be a number between 0 to 4000.";
   public static final String MSG_USER_CSV_INVALID =
       "Please revise your Users\' CSV file as it fails the validation.";
+  public static final String MSG_UPLOAD_SIZE_EXCEEDED =
+      "The file upload size is too big, please use a smaller file.";
   public static final String MSG_EXCEPTION =
       "An error has occured. Please contact chanjunweimy@gmail.com for more details.";
 
@@ -85,6 +88,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         HttpStatus.BAD_REQUEST, request);
   }
 
+  @ExceptionHandler(MaxUploadSizeExceededException.class)
+  protected ResponseEntity<Object> MaxUploadSizeExceededException(Exception ex, WebRequest request) {
+    _logger.error(ex.getMessage());
+    return handleExceptionInternal(ex, MSG_UPLOAD_SIZE_EXCEEDED, new HttpHeaders(), HttpStatus.BAD_REQUEST,
+        request);
+  }
+  
   @ExceptionHandler({CditException.class})
   protected ResponseEntity<Object> handleCditException(Exception ex, WebRequest request) {
     _logger.error(ex.getMessage());
@@ -97,5 +107,5 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     _logger.error(ex.getMessage());
     return handleExceptionInternal(ex, MSG_EXCEPTION, new HttpHeaders(), HttpStatus.BAD_REQUEST,
         request);
-  }
+  }  
 }
