@@ -49,7 +49,7 @@ public class UserServiceTest {
   }
 
   @Test
-  public void testUpdateUsers_AddNew() {
+  public void testUpdateUsersAddNew() {
     assertEquals(0, _userRepository.findAll().size());
 
     User expectedUser = new User("alice", 1);
@@ -66,7 +66,7 @@ public class UserServiceTest {
   }
 
   @Test
-  public void testUpdateUsers_ReplaceExisting() {
+  public void testUpdateUsersReplaceExisting() {
     User originalUser = new User("Bob", 2);
     _userRepository.saveAndFlush(originalUser);
 

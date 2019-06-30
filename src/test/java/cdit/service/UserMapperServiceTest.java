@@ -2,6 +2,7 @@ package cdit.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -251,11 +252,15 @@ public class UserMapperServiceTest {
   }
   
   @Test
-  public void testValidateHeaderIndicesSuccess() throws CditException {
-    Map<String, Integer> headerIndices = new Hashtable<String, Integer>();
-    headerIndices.put("name", 0);
-    headerIndices.put("salary", 1);
-    _userMapperService.validateHeaderIndices(headerIndices);
+  public void testValidateHeaderIndicesSuccess() {
+    try {
+      Map<String, Integer> headerIndices = new Hashtable<String, Integer>();
+      headerIndices.put("name", 0);
+      headerIndices.put("salary", 1);
+      _userMapperService.validateHeaderIndices(headerIndices);
+    } catch (CditException e) {
+      fail();
+    }
   }
   
   @Test(expected = UserMissingCsvHeaderException.class)
@@ -294,9 +299,13 @@ public class UserMapperServiceTest {
   }
   
   @Test
-  public void testValidateObjectSuccess() throws CditException {
-    User user = new User("bob", 3000);
-    _userMapperService.validateObject(user);
+  public void testValidateObjectSuccess() {    
+    try {
+      User user = new User("bob", 3000);
+      _userMapperService.validateObject(user);
+    } catch (CditException e) {
+      fail();
+    }
   }
   
   @Test(expected = UserNameIsEmptyException.class)
@@ -318,11 +327,15 @@ public class UserMapperServiceTest {
   }
   
   @Test
-  public void testValidateObjectsSuccess() throws CditException {
-    List<User> users = new ArrayList<User>();
-    users.add(new User("alice", 2999));
-    users.add(new User("bob", 2999));
-    _userMapperService.validateObjects(users);
+  public void testValidateObjectsSuccess() {
+    try {
+      List<User> users = new ArrayList<User>();
+      users.add(new User("alice", 2999));
+      users.add(new User("bob", 2999));
+      _userMapperService.validateObjects(users);
+    } catch (CditException e) {
+      fail();
+    }   
   }
   
   @Test(expected = UserDuplicateException.class)

@@ -78,21 +78,21 @@ public class UserRepositoryTest {
   }
 
   @Test(expected = ConstraintViolationException.class)
-  public void testSalaryConstraint_MinFailed() {
+  public void testSalaryConstraintMinFailed() {
     String name = "alice";
     User expectedUser = new User(name, -0.1);
     _userRepository.saveAndFlush(expectedUser);
   }
 
   @Test(expected = ConstraintViolationException.class)
-  public void testSalaryConstraint_MaxFailed() {
+  public void testSalaryConstraintMaxFailed() {
     String name = "alice";
     User expectedUser = new User(name, 4000.1);
     _userRepository.saveAndFlush(expectedUser);
   }
 
   @Test
-  public void testSalaryConstraint_MinSuccess() {
+  public void testSalaryConstraintMinSuccess() {
     String name = "alice";
     User expectedUser = new User(name, 0);
     _userRepository.saveAndFlush(expectedUser);
@@ -104,7 +104,7 @@ public class UserRepositoryTest {
   }
 
   @Test
-  public void testSalaryConstraint_MaxSuccess() {
+  public void testSalaryConstraintMaxSuccess() {
     String name = "alice";
     User expectedUser = new User(name, 0);
     _userRepository.saveAndFlush(expectedUser);
