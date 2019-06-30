@@ -24,7 +24,9 @@ public class StringArrayCsvMapper implements CditCsvMapper<String[]> {
   }
 
   @Override
-  public void validateHeaderIndices(Map<String, Integer> headerIndices) throws CditException {}
+  public void validateHeaderIndices(Map<String, Integer> headerIndices) throws CditException {
+    // Not doing any validation on test
+  }
 
   @Override
   public String[] createObjectByRow(String[] row, Map<String, Integer> headerIndices)
@@ -33,9 +35,13 @@ public class StringArrayCsvMapper implements CditCsvMapper<String[]> {
   }
 
   @Override
-  public void validateObject(String[] object) throws CditException {}
+  public void validateObject(String[] object) throws CditException {
+    // Not doing any validation on test
+  }
 
   @Override
-  public void validateObjects(List<String[]> objects) throws CditException {}
+  public void validateObjects(List<String[]> objects) throws CditException {
+    // Not doing any validation on test
+  }
 
 }
