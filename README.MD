@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/chanjunweimy/SalaryViewer.svg?branch=master)](https://travis-ci.org/chanjunweimy/SalaryViewer)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/113396cfca23473386ae3519972c1686)](https://www.codacy.com/app/chanjunweimy/SalaryViewer?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=chanjunweimy/SalaryViewer&amp;utm_campaign=Badge_Grade)
 
-A simple API endpoint developed using Java Spring Boot to display Employees' Salary
+A simple API endpoint developed using Java Spring Boot to display Employees' Salary.
 
 ## Table of Contents
 1.  [Use Case](#Use-Case)
@@ -15,7 +15,7 @@ A simple API endpoint developed using Java Spring Boot to display Employees' Sal
 7.  [Coding Style and Standard](#Coding-Style-and-Standard)
 
 ### Use Case
-1.  The user of ``SalaryViewer`` can update "users" by updating a csv file to ``/users`` via POST request.
+1.  The user of ``SalaryViewer`` can update "users" by uploading a csv file to ``/users`` via POST request.
 2.  The user of ``SalaryViewer`` can view "users" by accessing to ``/users`` via GET request.
 
 ### QuickStart
@@ -30,17 +30,17 @@ A simple API endpoint developed using Java Spring Boot to display Employees' Sal
 Java 12
 
 ### Architecture
-``User -> **Controller** -> **Service** -> **Dao** -> Database``
+``User -> **Controller** -> **Service** -> **DAO** -> Database``
 
 1.  ``**Controller**``: Used to handle web requests.
 2.  ``**Service**``: Services that handle business logics.
-3.  ``**Dao**``: Spring Data JPA Feature, create repository implementations automatically, at runtime, from a repository interface.
+3.  ``**DAO**``: Spring Data JPA Feature, create repository implementations automatically, at runtime, from a repository interface.
 
 ### Database
 h2 Database (in memory database)
 
 ### Design Consideration
-1.  The maximum file upload limit is 2MB as a csv file containing 100000 users is approximately 1MB file size.
+1.  The maximum file upload limit is 2MB as a csv file containing 100,000 users is approximately 1MB file size.
 
 2.  User CSV File has the following specifications:
 
